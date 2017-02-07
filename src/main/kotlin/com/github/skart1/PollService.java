@@ -2,7 +2,6 @@ package com.github.skart1;
 
 import com.github.skart1.storage.game.GameEntity;
 import com.github.skart1.storage.game.GameStorage;
-import com.github.skart1.storage.game.ImageEntity;
 import com.github.skart1.storage.schedule.*;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -17,6 +16,7 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -24,9 +24,7 @@ import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -141,28 +139,54 @@ public class PollService {
 
     @Nullable
     private GameEntity parseGameEntity(List<String> row) {
-        try {
-            List<ImageEntity> images = Arrays.asList(row.get(2).split("\\r\\n|\\n|\\r")).stream().map(s -> {
-                List<String> arr = Arrays.asList(s.split("\\s+"));
-                String link = "";
-                String description = "";
+        int nameRow = 0;
+        int descriptionRow = 1;
+        int genreRowFirst = 2;
+        int genreRowLast = 4;
+        int isCoopRow = 5;
+        int difficultyRow = 6;
 
-                if (arr.size() == 0) {
-                    return null;
-                }
-                if (arr.size() > 0) {
-                    link = arr.get(0);
-                }
-                if (arr.size() > 1) {
-                    description = arr.get(1);
-                }
-                return new ImageEntity(link, description);
-            }).filter(i -> i != null).collect(Collectors.toList());
-            return new GameEntity(row.get(0), row.get(1), images);
+        try {
+//            List<ImageEntity> images = Arrays.asList(row.get(2).split("\\r\\n|\\n|\\r")).stream().map(s -> {
+//                List<String> arr = Arrays.asList(s.split("\\s+"));
+//                String link = "";
+//                String description = "";
+//
+//                if (arr.size() == 0) {
+//                    return null;
+//                }
+//                if (arr.size() > 0) {
+//                    link = arr.get(0);
+//                }
+//                if (arr.size() > 1) {
+//                    description = arr.get(1);
+//                }
+//                return new ImageEntity(link, description);
+//            }).filter(i -> i != null).collect(Collectors.toList());
+
+
+            String name = row.get(nameRow);
+            String description = row.get(descriptionRow);
+            Set<GameEntity.Genre> genres = getGenres(row, genreRowFirst, genreRowLast);
+            GameEntity.Coop coop = GameEntity.Coop.getEnumValue(row.get(isCoopRow));
+            GameEntity.Difficulty difficulty = GameEntity.Difficulty.getEnumValue((row.get(difficultyRow));
+
+            return new GameEntity(name, description, genres, coop, difficulty);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    @NotNull
+    private Set<GameEntity.Genre> getGenres(List<String> row, int genreRowFirst, int genreRowLast) {
+        Set<GameEntity.Genre> genres = new LinkedHashSet<>();
+        for(int i = genreRowFirst; i < genreRowLast; i++) {
+            if(!row.get(i).isEmpty()) {
+                genres.add(GameEntity.Genre.getEnumValue(row.get(i)));
+            }
+        }
+        return genres;
     }
 
 

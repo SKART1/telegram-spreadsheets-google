@@ -72,3 +72,5 @@ buildNumber.properties
 /secret.json
 /config.properties
 /.idea/
+/src/main/resources/secret.json
+/src/main/resources/config.properties
