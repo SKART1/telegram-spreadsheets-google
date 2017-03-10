@@ -64,6 +64,12 @@
             <artifactId>google-api-services-sheets</artifactId>
             <version>v4-rev38-1.22.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.7.9</version>
+        </dependency>
     </dependencies>
 
     <build>

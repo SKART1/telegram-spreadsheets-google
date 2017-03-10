@@ -72,5 +72,11 @@ buildNumber.properties
 /secret.json
 /config.properties
 /.idea/
+VRGameBot.iml
 /src/main/resources/secret.json
 /src/main/resources/config.properties
+
+
+
+#Mac
+.DS_Store

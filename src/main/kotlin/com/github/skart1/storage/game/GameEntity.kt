@@ -6,7 +6,8 @@ data class GameEntity(val name: String, val description: String, val genres: Set
                       val coop: Coop, val difficulty: Difficulty, val age: Age, val room: Set<Room>) {
     enum class Genre(val string: String) {
         Shooting("стрелялки"),
-        Extreme("экстрим");
+        Extreme("экстрим"),
+        Sport("спорт");
 
         companion object {
             @JvmStatic private val map: MutableMap<String, Genre> = HashMap()
@@ -24,8 +25,8 @@ data class GameEntity(val name: String, val description: String, val genres: Set
     }
 
     enum class Coop(val string: String) {
-        Shooting("да"),
-        Extreme("нет");
+        Yes("да"),
+        No("нет");
 
         companion object {
             @JvmStatic private val map: MutableMap<String, Coop> = HashMap()
@@ -43,8 +44,9 @@ data class GameEntity(val name: String, val description: String, val genres: Set
     }
 
     enum class Difficulty(val string: String) {
-        Shooting("да"),
-        Extreme("нет");
+        Easy("простая"),
+        Middle("средняя"),
+        Hard("сложнаая");
 
         companion object {
             @JvmStatic private val map: MutableMap<String, Difficulty> = HashMap()
@@ -62,11 +64,40 @@ data class GameEntity(val name: String, val description: String, val genres: Set
     }
 
     enum class Age(val string: String) {
+        NoLimit("без ограничений");
 
+        companion object {
+            @JvmStatic private val map: MutableMap<String, Age> = HashMap()
+
+            init {
+                for(age in Age.values()) {
+                    map.put(age.string, age)
+                }
+            }
+
+            @JvmStatic fun getEnumValue(string: String): Age {
+                return map[string] ?: throw IllegalArgumentException("Unknown String Value: " + string)
+            }
+        }
     }
 
     enum class Room(val string: String) {
+        RedRoom("красная комната"),
+        BlueRoom("синяя комната");
 
+        companion object {
+            @JvmStatic private val map: MutableMap<String, Room> = HashMap()
+
+            init {
+                for(room in Room.values()) {
+                    map.put(room.string, room)
+                }
+            }
+
+            @JvmStatic fun getEnumValue(string: String): Room {
+                return map[string] ?: throw IllegalArgumentException("Unknown String Value: " + string)
+            }
+        }
     }
 }
 

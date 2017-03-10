@@ -1,7 +1,7 @@
 package com.github.skart1.view
 
+import com.github.skart1.storage.game.GameEntity
 import com.github.skart1.storage.game.GameStorage
-import com.github.skart1.storage.schedule.ScheduleStorage
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.model.request.KeyboardButton
 import com.pengrad.telegrambot.model.request.ParseMode
@@ -23,7 +23,7 @@ fun showGamesListWithTextPrefix(bot: TelegramBot, chatId: Long, gameStorage: Gam
     val keyboardButtons = ArrayList<KeyboardButton>()
     keyboardButtons.add(KeyboardButton(BACK))
     games.forEachIndexed { i, gameEntity ->
-        responseStringBuilder.append(i + 1).append(". ").append(gameEntity.shortName).append("\n")
+        responseStringBuilder.append(i + 1).append(". ").append(gameEntity.name).append("\n")
         keyboardButtons.add(KeyboardButton((i + 1).toString()))
     }
 
@@ -35,7 +35,7 @@ fun showGamesListWithTextPrefix(bot: TelegramBot, chatId: Long, gameStorage: Gam
             .parseMode(ParseMode.HTML)
             .disableWebPagePreview(true)
             .disableNotification(true)
-            //.replyMarkup(keyboard)
+    //.replyMarkup(keyboard)
 
     bot.execute(response)
 }
@@ -69,6 +69,21 @@ fun showReadme(bot: TelegramBot, chatId: Long) {
             .disableWebPagePreview(true)
             .disableNotification(true)
 
+    bot.execute(response)
+}
+
+fun displayGenres(bot: TelegramBot, chatId: Long, genres: Set<GameEntity.Genre>) {
+    val resultStr = StringBuilder()
+
+    fun appendRow(row: Int, genre: GameEntity.Genre) {
+        resultStr.append(row).append(". ").append(genre.string).append("\n")
+    }
+    genres.forEachIndexed(::appendRow)
+
+    val response = SendMessage(chatId, resultStr.toString())
+            .parseMode(ParseMode.HTML)
+            .disableWebPagePreview(true)
+            .disableNotification(true)
     bot.execute(response)
 }
 

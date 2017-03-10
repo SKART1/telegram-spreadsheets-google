@@ -1,29 +1,37 @@
 package com.github.skart1.state
 
+import com.github.skart1.storage.UserStorage
 import com.github.skart1.storage.game.GameEntity
 import com.github.skart1.storage.game.GameStorage
-import com.github.skart1.view.ENTER_CANCEL_COMMAND
-import com.github.skart1.view.sendMessage
-import com.github.skart1.view.showGamesList
-import com.github.skart1.view.showReadme
+import com.github.skart1.view.*
 import com.pengrad.telegrambot.TelegramBot
 import com.pengrad.telegrambot.model.Update
 import com.pengrad.telegrambot.model.request.ParseMode
 import com.pengrad.telegrambot.request.SendMessage
 import com.pengrad.telegrambot.request.SendPhoto
 
-class GamesListSelectedState(var gameStorage: GameStorage): State {
+class GamesListSelectedState(var gameStorage: GameStorage, var userStorage: UserStorage): State {
 
 
     override fun newUpdate(ableToState: AbleToState, stateInstanceProvider: StateInstanceProvider, bot: TelegramBot, update: Update) {
-        val chatId = update.message().chat().id()
         val message = update.message()
+        val userId = message.from().id()
         val text = message.text()
+        val chatId = message.chat().id()
+
+        val user = userStorage.getUser(userId)
 
         when (text) {
             Commands.CANCEL.text -> {
                 showReadme(bot, chatId)
                 ableToState.putState(stateInstanceProvider.getInitialStateInstance())
+            }
+            Commands.SHOW_GENRES.text -> {
+                val genres = gameStorage.getCurrentGenres()
+                user.setGenres(genres)
+
+                displayGenres(bot, chatId, genres)
+                ableToState.putState(stateInstanceProvider.getSelectingGenresState())
             }
             else -> {
                 try {
@@ -52,17 +60,17 @@ class GamesListSelectedState(var gameStorage: GameStorage): State {
     }
 
     private fun showGameInfo(gameEntity: GameEntity, bot: TelegramBot, chatId: Long) {
-        val mainResponse = SendMessage(chatId, gameEntity.shortName + " " + gameEntity.longName)
+        val mainResponse = SendMessage(chatId, gameEntity.name + " " + gameEntity.description)
                 .parseMode(ParseMode.HTML)
                 .disableWebPagePreview(true)
                 .disableNotification(true)
         bot.execute(mainResponse)
 
-        gameEntity.imageEntities.listIterator().forEach {
-            val imageResponse = SendPhoto(chatId, it.link)
-                    .caption(it.comment)
-            bot.execute(imageResponse)
-        }
+//        gameEntity.imageEntities.listIterator().forEach {
+//            val imageResponse = SendPhoto(chatId, it.link)
+//                    .caption(it.comment)
+//            bot.execute(imageResponse)
+//        }
     }
 
     fun sayRetry(text: String, bot: TelegramBot, chatId: Long) {

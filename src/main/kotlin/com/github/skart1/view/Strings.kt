@@ -14,7 +14,6 @@ val HELP_MESSAGE: String = "Я могу помочь вам предостави
         "Список доступных команд:\n" +
         "${Commands.HELP} - ${Commands.HELP.description}\n" +
         "${Commands.GAMES} - ${Commands.GAMES.description}\n" +
-        "${Commands.SCHEDULE} - ${Commands.SCHEDULE.description}\n" +
         "${Commands.CANCEL} - ${Commands.CANCEL.description}\n"
 
 

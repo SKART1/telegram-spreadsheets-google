@@ -2,11 +2,10 @@ package com.github.skart1
 
 import com.github.skart1.state.GamesListSelectedState
 import com.github.skart1.state.InitialState
-import com.github.skart1.state.ScheduleSelectedState
+import com.github.skart1.state.SelectingGenresState
 import com.github.skart1.state.StateInstanceProvider
 import com.github.skart1.storage.UserStorage
 import com.github.skart1.storage.game.GameStorage
-import com.github.skart1.storage.schedule.ScheduleStorage
 import com.pengrad.telegrambot.TelegramBotAdapter
 import java.util.*
 
@@ -19,7 +18,7 @@ fun main(args: Array<String>) {
 
     fun read(configFile: String): Properties {
         val conf = Properties()
-        Thread.currentThread().contextClassLoader.getResourceAsStream(configFile).use{
+        Thread.currentThread().contextClassLoader.getResourceAsStream(configFile).use {
             resourceStream -> conf.load(resourceStream)
         }
         return conf
@@ -57,15 +56,13 @@ fun main(args: Array<String>) {
 private class Main(private val spreadsheetId: String, admins: List<Int>, token: String) : StateInstanceProvider, Runnable {
     private val users = UserStorage(this)
     private val gameStorage = GameStorage()
-    private val scheduleStorage = ScheduleStorage()
 
-    private val initialState =  InitialState(admins, gameStorage, scheduleStorage)
+    private val initialState =  InitialState(admins, gameStorage)
     private val gameListSelectedState =  GamesListSelectedState(gameStorage)
-    private val scheduleSelectedState =  ScheduleSelectedState(scheduleStorage)
     private val bot = TelegramBotAdapter.build(token)
 
     override fun run() {
-        val polService = PollService(spreadsheetId, gameStorage, scheduleStorage)
+        val polService = PollService(spreadsheetId, gameStorage)
         polService.start()
 
         bot.setGetUpdatetsListener { updates ->
@@ -89,8 +86,8 @@ private class Main(private val spreadsheetId: String, admins: List<Int>, token: 
         return gameListSelectedState
     }
 
-    override fun getScheduleSelectedState(): ScheduleSelectedState {
-        return scheduleSelectedState
+    override fun getSelectingGenresState(): SelectingGenresState {
+        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
 
